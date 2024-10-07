@@ -569,7 +569,7 @@ class Schema(BaseModel):
     Additional external documentation for this schema.
     """
 
-    example: Optional[Any] = None
+    examples: Optional[Any] = Field(default=None, alias="example")
     """
     A free-form property to include an example of an instance for this schema.
     To represent examples that cannot be naturally represented in JSON or YAML,
