@@ -115,7 +115,7 @@ class ParameterBase(BaseModel):
     - for `cookie` - `form`.
     """
 
-    explode: bool = False
+    explode: Optional[bool] = None
     """
     When this is true, parameter values of type `array` or `object` generate separate 
     parameters for each value of the array or key-value pair of the map.
@@ -124,7 +124,7 @@ class ParameterBase(BaseModel):
     For all other styles, the default value is `false`.
     """
 
-    param_schema: Optional[Union[Schema, Reference]] = Field(
+    param_schema: Optional[Union[Reference, Schema]] = Field(
         default=None, alias="schema"
     )
     """
@@ -147,8 +147,7 @@ class ParameterBase(BaseModel):
     Examples of the parameter's potential value.
     Each example SHOULD contain a value in the correct format as specified in the 
     parameter encoding. The `examples` field is mutually exclusive of the `example` 
-    field.
-    Furthermore, if referencing a `schema` that contains an example,
+    field. Furthermore, if referencing a `schema` that contains an example,
     the `examples` value SHALL _override_ the example provided by the schema.
     """
 
@@ -156,9 +155,9 @@ class ParameterBase(BaseModel):
     For more complex scenarios, the [`content`](#parameterContent) property 
     can define the media type and schema of the parameter.
     A parameter MUST contain either a `schema` property, or a `content` property, but 
-    not both.
-    When `example` or `examples` are provided in conjunction with the `schema` object,
-    the example MUST follow the prescribed serialization strategy for the parameter.
+    not both. When `example` or `examples` are provided in conjunction with the 
+    `schema` object, the example MUST follow the prescribed serialization strategy for 
+    the parameter.
     """
 
     content: Optional[Dict[str, MediaType]] = None
@@ -200,8 +199,8 @@ class Parameter(ParameterBase):
 
     - If [`in`](#parameterIn) is `"path"`, the `name` field MUST correspond to a
       template expression occurring within the [path](#pathsPath) field in the
-      [Paths Object](#pathsObject).
-      See [Path Templating](#pathTemplating) for further information.
+      [Paths Object](#pathsObject). See [Path Templating](#pathTemplating) for further
+      information.
     - If [`in`](#parameterIn) is `"header"` and the `name` field is `"Accept"`,
       `"Content-Type"` or `"Authorization"`, the parameter definition SHALL be ignored.
     - For all other cases, the `name` corresponds to the parameter name used by the
