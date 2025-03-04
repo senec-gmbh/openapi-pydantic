@@ -68,6 +68,10 @@ def test_field_with_examples() -> None:
         json_api: Any = api.dict(by_alias=True, exclude_none=True)
     validate(json_api)
 
+    json_dict = api.components.schemas["SampleRequest"].model_dump(by_alias=True, exclude_none=True)
+    assert json_dict["properties"]["field"]["example"] == "example1"
+    assert "examples" not in json_dict["properties"]["field"]
+
 
 def construct_sample_api(SampleModel) -> OpenAPI:
     class SampleRequest(SampleModel):

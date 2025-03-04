@@ -1,9 +1,8 @@
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, Annotated
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, BeforeValidator
 
 from openapi_pydantic.compat import PYDANTIC_V2, ConfigDict, Extra, min_length_arg
-
 from .datatype import DataType
 from .discriminator import Discriminator
 from .external_documentation import ExternalDocumentation
@@ -64,7 +63,7 @@ _examples = [
     },
     {
         "description": "A representation of a cat. "
-        "Note that `Cat` will be used as the discriminator value.",
+                       "Note that `Cat` will be used as the discriminator value.",
         "allOf": [
             {"$ref": "#/components/schemas/Pet"},
             {
@@ -88,7 +87,7 @@ _examples = [
     },
     {
         "description": "A representation of a dog. "
-        "Note that `Dog` will be used as the discriminator value.",
+                       "Note that `Dog` will be used as the discriminator value.",
         "allOf": [
             {"$ref": "#/components/schemas/Pet"},
             {
@@ -107,6 +106,12 @@ _examples = [
         ],
     },
 ]
+
+
+def unwrap_first(value: Any) -> Any:
+    if isinstance(value, list) and len(value) > 0:
+        return value[0]
+    return value
 
 
 class Schema(BaseModel):
@@ -569,7 +574,7 @@ class Schema(BaseModel):
     Additional external documentation for this schema.
     """
 
-    examples: Optional[Any] = Field(default=None, alias="example")
+    examples: Annotated[Optional[Any], BeforeValidator(unwrap_first)] = Field(default=None, serialization_alias="example")
     """
     A free-form property to include an example of an instance for this schema.
     To represent examples that cannot be naturally represented in JSON or YAML,
@@ -600,12 +605,13 @@ class Schema(BaseModel):
 if TYPE_CHECKING:
 
     def schema_validate(
-        obj: Any,
-        *,
-        strict: Optional[bool] = None,
-        from_attributes: Optional[bool] = None,
-        context: Optional[Dict[str, Any]] = None
-    ) -> Schema: ...
+            obj: Any,
+            *,
+            strict: Optional[bool] = None,
+            from_attributes: Optional[bool] = None,
+            context: Optional[Dict[str, Any]] = None
+    ) -> Schema:
+        ...
 
 elif PYDANTIC_V2:
     schema_validate = Schema.model_validate
